@@ -30,4 +30,5 @@ export interface AppState {
   activeProjectId: string | null
   activeTabId: string | null
   searchQuery: string
+  learnedRules: Record<string, NoteCategory>
 }

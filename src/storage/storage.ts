@@ -9,6 +9,7 @@ const EMPTY: AppState = {
   activeProjectId: null,
   activeTabId: null,
   searchQuery: '',
+  learnedRules: {},
 }
 
 export function load(): AppState {

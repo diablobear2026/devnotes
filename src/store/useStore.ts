@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { v4 as uuid } from 'uuid'
 import type { AppState, Note, NoteCategory, Project, Tab } from '../types'
 import { load, save } from '../storage/storage'
-import { classify } from '../lib/classifier'
+import { classify, extractSignal } from '../lib/classifier'
 
 interface Actions {
   createProject: (name: string) => void
@@ -16,6 +16,7 @@ interface Actions {
   addNote: (content: string, category?: NoteCategory) => void
   updateNote: (id: string, content: string, manualCategory?: NoteCategory) => void
   deleteNote: (id: string) => void
+  deleteLearnedRule: (key: string) => void
 
   setSearchQuery: (q: string) => void
   exportData: () => void
@@ -93,12 +94,12 @@ export const useStore = create<Store>((set, get) => {
     },
 
     addNote(content, category) {
-      const { activeProjectId, activeTabId } = get()
+      const { activeProjectId, activeTabId, learnedRules } = get()
       if (!activeProjectId || !activeTabId) return
       const note: Note = {
         id: uuid(),
         content,
-        category: category ?? classify(content),
+        category: category ?? classify(content, learnedRules),
         createdAt: Date.now(),
         tabId: activeTabId,
         projectId: activeProjectId,
@@ -107,23 +108,41 @@ export const useStore = create<Store>((set, get) => {
     },
 
     updateNote(id, content, manualCategory) {
-      set(s => persist({
-        ...s,
-        notes: s.notes.map(n => {
-          if (n.id !== id) return n
-          // 手工分类：锁定类别，不再自动分类
-          if (manualCategory !== undefined) {
-            return { ...n, content, category: manualCategory, manualCategory: true }
+      set(s => {
+        let learnedRules = s.learnedRules
+        if (manualCategory !== undefined) {
+          const signal = extractSignal(content)
+          if (signal) {
+            learnedRules = { ...learnedRules, [signal]: manualCategory }
           }
-          // 内容变更：若已手工分类则保持类别，否则自动重分类
-          const category = n.manualCategory ? n.category : classify(content)
-          return { ...n, content, category }
-        }),
-      }))
+        }
+        return persist({
+          ...s,
+          learnedRules,
+          notes: s.notes.map(n => {
+            if (n.id !== id) return n
+            // 手工分类：锁定类别，不再自动分类
+            if (manualCategory !== undefined) {
+              return { ...n, content, category: manualCategory, manualCategory: true }
+            }
+            // 内容变更：若已手工分类则保持类别，否则自动重分类
+            const category = n.manualCategory ? n.category : classify(content, learnedRules)
+            return { ...n, content, category }
+          }),
+        })
+      })
     },
 
     deleteNote(id) {
       set(s => persist({ ...s, notes: s.notes.filter(n => n.id !== id) }))
+    },
+
+    deleteLearnedRule(key) {
+      set(s => {
+        const rest = { ...s.learnedRules }
+        delete rest[key]
+        return persist({ ...s, learnedRules: rest })
+      })
     },
 
     setSearchQuery(q) {
@@ -132,7 +151,7 @@ export const useStore = create<Store>((set, get) => {
 
     exportData() {
       const s = get()
-      const data = { projects: s.projects, tabs: s.tabs, notes: s.notes }
+      const data = { projects: s.projects, tabs: s.tabs, notes: s.notes, learnedRules: s.learnedRules }
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -155,6 +174,7 @@ export const useStore = create<Store>((set, get) => {
           activeProjectId: firstProject?.id ?? null,
           activeTabId: firstTab?.id ?? null,
           searchQuery: '',
+          learnedRules: data.learnedRules ?? {},
         }
         set(persist({ ...next, activeCategoryFilter: null } as AppState))
       } catch {
