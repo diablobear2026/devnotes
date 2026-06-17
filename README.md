@@ -2,7 +2,7 @@
 
 > 面向开发者的本地知识管理工具 · A local knowledge manager built for developers
 
-<video src="demo/devnotes-demo.mp4" autoplay loop muted playsinline controls></video>
+<video src="https://github.com/diablobear2026/devnotes/raw/main/demo/devnotes-demo.mp4" autoplay loop muted playsinline controls></video>
 
 ---
 
