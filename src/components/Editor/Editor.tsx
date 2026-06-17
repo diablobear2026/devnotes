@@ -5,6 +5,7 @@ import { groupLines, classify } from '../../lib/classifier'
 export function Editor() {
   const addNote = useStore(s => s.addNote)
   const activeTabId = useStore(s => s.activeTabId)
+  const learnedRules = useStore(s => s.learnedRules)
   const [value, setValue] = useState('')
 
   function handleSubmit(e: React.FormEvent) {
@@ -12,7 +13,7 @@ export function Editor() {
     if (!activeTabId) return
     const lines = groupLines(value.split('\n').map(l => l.trim()).filter(Boolean))
     if (!lines.length) return
-    const categories = lines.map(l => classify(l))
+    const categories = lines.map(l => classify(l, learnedRules))
     const allSame = categories.every(c => c === categories[0])
     if (allSame) {
       addNote(value.trim(), categories[0])
