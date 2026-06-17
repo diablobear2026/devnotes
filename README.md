@@ -2,6 +2,8 @@
 
 > 面向开发者的本地知识管理工具 · A local knowledge manager built for developers
 
+![demo](devnotes.gif)
+
 ---
 
 ## 简介 · About

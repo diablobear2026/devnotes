@@ -1,0 +1,222 @@
+{
+  "projects": [
+    {
+      "id": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7",
+      "name": "博客平台",
+      "createdAt": 1781227800000
+    },
+    {
+      "id": "5a5392e2-7c46-469e-8922-378f9c104081",
+      "name": "移动端 App",
+      "createdAt": 1781403600000
+    }
+  ],
+  "tabs": [
+    {
+      "id": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "name": "本地开发",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7",
+      "createdAt": 1781227800000
+    },
+    {
+      "id": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "name": "生产环境",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7",
+      "createdAt": 1781330700000
+    },
+    {
+      "id": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "name": "测试环境",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081",
+      "createdAt": 1781403600000
+    },
+    {
+      "id": "3f981ef4-a9a1-4d34-a1bf-7e9f92ecea75",
+      "name": "CI / 发布",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081",
+      "createdAt": 1781513100000
+    }
+  ],
+  "notes": [
+    {
+      "id": "54cc51e7-6859-4671-8c5f-b9f660c3dc84",
+      "content": "npm run dev",
+      "category": "cmd",
+      "createdAt": 1781227800000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "74d18707-1dcd-42cb-8253-25c211550ee3",
+      "content": "docker compose up -d postgres redis",
+      "category": "cmd",
+      "createdAt": 1781227860000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "75be9b7f-be4a-4d9e-8704-5f2d230a8904",
+      "content": "http://localhost:3000/api/health",
+      "category": "url",
+      "createdAt": 1781227920000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "dc60250e-cba4-4cb7-9867-3a3c4544938d",
+      "content": "DATABASE_URL=postgres://blog_user:blog_pass@localhost:5432/blog_dev",
+      "category": "config",
+      "createdAt": 1781227980000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "6d2be35e-da0e-474a-b97f-326a0a3e94e6",
+      "content": "NODE_ENV=development",
+      "category": "config",
+      "createdAt": 1781228040000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "0d9e389c-9adf-4099-8650-f92df558c496",
+      "content": "记得周五前把数据库迁移脚本跑一遍，迁移文件在 migrations/0007_add_index.sql",
+      "category": "note",
+      "createdAt": 1781228100000,
+      "tabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "6faac46f-2aea-4e32-82a1-86fdb3b7c62f",
+      "content": "ssh deploy@10.20.30.40",
+      "category": "cmd",
+      "createdAt": 1781330700000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "bc0b5439-3e71-44dd-8c6f-24fcf37c4ec6",
+      "content": "https://api.blog-platform.com/v1/health",
+      "category": "url",
+      "createdAt": 1781330760000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "49a6d1bf-8854-4aa0-ad41-a403a9efd5f8",
+      "content": "sk-live-FAKE51HZ9bQwerty0000000000000000000000000000",
+      "category": "secret",
+      "createdAt": 1781330820000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "e5be7874-21fc-4edc-a19c-44bc741a793a",
+      "content": "AKIAFAKEEXAMPLE7EXAMP",
+      "category": "secret",
+      "createdAt": 1781330880000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "0cbec214-4476-483d-a356-99f7e47c0ac4",
+      "content": "ops-alert@example.com",
+      "category": "secret",
+      "createdAt": 1781330940000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "9644b482-48c1-41b8-bb55-c8ea0c4ef678",
+      "content": "NODE_ENV=production",
+      "category": "config",
+      "createdAt": 1781331000000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "2374e221-773d-426d-b400-3f5b5cb1c2b3",
+      "content": "上线前再确认一遍 CDN 缓存已刷新，不然首页样式会错乱",
+      "category": "note",
+      "createdAt": 1781331060000,
+      "tabId": "15f318eb-18f4-4568-bfa6-90f102db02a4",
+      "projectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7"
+    },
+    {
+      "id": "eeaac15f-915a-4ebe-bfd5-deee12178fd7",
+      "content": "npx react-native run-ios --simulator=\"iPhone 15\"",
+      "category": "cmd",
+      "createdAt": 1781403600000,
+      "tabId": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "b26d98c1-339a-420b-b8db-cd3791d65d3c",
+      "content": "192.168.1.50:8081",
+      "category": "url",
+      "createdAt": 1781403660000,
+      "tabId": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "7d08fcb7-d6ac-40d8-9a46-6f05c3c9868a",
+      "content": "FCM_SERVER_KEY=AAAAFAKEkey:APA91bFAKE0000000000000000000000000000000000000000000000",
+      "category": "secret",
+      "createdAt": 1781403720000,
+      "tabId": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "3f4f8968-9efc-4809-acd0-3ce1e85995da",
+      "content": "测试账号手机号 13800001111，验证码固定 123456",
+      "category": "secret",
+      "createdAt": 1781403780000,
+      "tabId": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "abc59003-665c-41d3-974d-25dcb8eb2385",
+      "content": "API_BASE_URL=https://staging-api.myapp.com",
+      "category": "config",
+      "createdAt": 1781403840000,
+      "tabId": "b1e1ab4d-c914-4b6a-baeb-8be70c2bfa31",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "f0f9781e-d0f5-4ce1-82bf-70fddd779c40",
+      "content": "git tag v1.4.0 && git push origin v1.4.0",
+      "category": "cmd",
+      "createdAt": 1781513100000,
+      "tabId": "3f981ef4-a9a1-4d34-a1bf-7e9f92ecea75",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "e4c4e58f-11eb-4dd0-adf4-36dc8e596587",
+      "content": "fastlane ios release",
+      "category": "cmd",
+      "createdAt": 1781513160000,
+      "tabId": "3f981ef4-a9a1-4d34-a1bf-7e9f92ecea75",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "15d422fd-cd58-40b4-a55c-ec226f12eaaa",
+      "content": "ASC_API_KEY=FAKE-2X9Q7R-asckey-0000000000000000",
+      "category": "secret",
+      "manualCategory": true,
+      "createdAt": 1781513220000,
+      "tabId": "3f981ef4-a9a1-4d34-a1bf-7e9f92ecea75",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    },
+    {
+      "id": "fce55fd2-3aab-4db9-b428-8b294a96cac7",
+      "content": "审核被拒过一次，注意隐私政策链接必须能在 App 内直接打开",
+      "category": "note",
+      "createdAt": 1781658900000,
+      "tabId": "3f981ef4-a9a1-4d34-a1bf-7e9f92ecea75",
+      "projectId": "5a5392e2-7c46-469e-8922-378f9c104081"
+    }
+  ],
+  "activeProjectId": "933ccf40-3f9e-4f72-81cb-9a0ed8cd7ee7",
+  "activeTabId": "d3767d39-40b4-405f-8b70-76a7669b1b95",
+  "searchQuery": ""
+}
