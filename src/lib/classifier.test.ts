@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { classify } from './classifier'
+import { classify, extractSignal } from './classifier'
 
 describe('classify', () => {
   it('identifies shell commands', () => {
@@ -37,5 +37,40 @@ describe('classify', () => {
     expect(classify('这是一条普通备注')).toBe('note')
     expect(classify('Hello world')).toBe('note')
     expect(classify('')).toBe('note')
+  })
+})
+
+describe('cmd flag detection', () => {
+  it('identifies unknown CLI tools by their flag pattern', () => {
+    expect(classify('claude --resume 4338966a-ba3f-4dfd-9aca-9ac59d08d736')).toBe('cmd')
+    expect(classify('vercel --prod')).toBe('cmd')
+    expect(classify('gh pr create --title "fix bug"')).toBe('cmd')
+  })
+})
+
+describe('extractSignal', () => {
+  it('extracts the leading word for bare command-like lines', () => {
+    expect(extractSignal('claude --resume xxx')).toBe('claude')
+  })
+
+  it('extracts the key for label-style lines', () => {
+    expect(extractSignal('Skills: /gen-sprite')).toBe('skills')
+    expect(extractSignal('PORT=3000')).toBe('port')
+  })
+
+  it('returns null for CJK or empty content', () => {
+    expect(extractSignal('这是一条普通备注')).toBeNull()
+    expect(extractSignal('')).toBeNull()
+  })
+})
+
+describe('learnedRules override', () => {
+  it('lets a learned rule override the default classification', () => {
+    expect(classify('claude --resume xxx', { claude: 'note' })).toBe('note')
+    expect(classify('Skills: /gen-sprite', { skills: 'cmd' })).toBe('cmd')
+  })
+
+  it('falls back to normal rules when there is no matching learned rule', () => {
+    expect(classify('Skills: /gen-sprite', { other: 'cmd' })).toBe('config')
   })
 })

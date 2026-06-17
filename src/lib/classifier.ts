@@ -27,6 +27,21 @@ function isConnectionLine(line: string): boolean {
 
 const CONFIG_PATTERN = /^[A-Z_][A-Z0-9_]*\s*=\s*\S|^\w[\w.-]*\s*:\s*\S|^"\w[\w.-]*"\s*:\s*/
 
+const CMD_FLAG_PATTERN = /^[\w./-]+(?:\s+[\w./-]+){0,2}\s+--?[A-Za-z][\w-]*/
+
+const LABEL_SIGNAL = /^([\w.-]+)\s*[:=]/
+const WORD_SIGNAL = /^([A-Za-z][\w.-]*)/
+
+export function extractSignal(text: string): string | null {
+  const firstLine = text.trim().split('\n')[0] ?? ''
+  if (!firstLine) return null
+  const labelMatch = LABEL_SIGNAL.exec(firstLine)
+  if (labelMatch) return labelMatch[1].toLowerCase()
+  const wordMatch = WORD_SIGNAL.exec(firstLine)
+  if (wordMatch) return wordMatch[1].toLowerCase()
+  return null
+}
+
 function shannonEntropy(s: string): number {
   const freq: Record<string, number> = {}
   for (const c of s) freq[c] = (freq[c] ?? 0) + 1
@@ -87,9 +102,12 @@ export function groupLines(lines: string[]): string[] {
 /** @deprecated use groupLines */
 export const pairCredentials = groupLines
 
-export function classify(text: string): NoteCategory {
+export function classify(text: string, learnedRules: Record<string, NoteCategory> = {}): NoteCategory {
   const trimmed = text.trim()
   if (!trimmed) return 'note'
+
+  const signal = extractSignal(trimmed)
+  if (signal && learnedRules[signal]) return learnedRules[signal]
 
   if (CMD_PREFIXES.test(trimmed)) return 'cmd'
   if (URL_PATTERN.test(trimmed)) return 'url'
@@ -99,6 +117,7 @@ export function classify(text: string): NoteCategory {
   // High-confidence prefix patterns take priority over config
   if (SECRET_PREFIXES.test(trimmed)) return 'secret'
   if (CONFIG_PATTERN.test(trimmed)) return 'config'
+  if (CMD_FLAG_PATTERN.test(trimmed)) return 'cmd'
   // Entropy-based fallback for opaque tokens (after config to avoid false positives)
   if (looksLikeSecret(trimmed)) return 'secret'
   return 'note'
