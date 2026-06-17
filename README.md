@@ -2,7 +2,7 @@
 
 > 面向开发者的本地知识管理工具 · A local knowledge manager built for developers
 
-![demo](devnotes.gif)
+<video src="demo/devnotes-demo.mp4" autoplay loop muted playsinline controls></video>
 
 ---
 
