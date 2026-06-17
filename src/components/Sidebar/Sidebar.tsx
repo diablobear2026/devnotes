@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../../store/useStore'
+import { LearnedRulesPanel } from '../LearnedRules/LearnedRulesPanel'
 
 export function Sidebar() {
   const projects = useStore(s => s.projects)
@@ -14,6 +15,7 @@ export function Sidebar() {
   const [newName, setNewName] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [showLearnedRules, setShowLearnedRules] = useState(false)
 
   function startRename(id: string, current: string) {
     setEditingId(id)
@@ -37,9 +39,20 @@ export function Sidebar() {
 
   return (
     <aside className="w-52 shrink-0 flex flex-col border-r border-glass-border glass-panel">
-      <div className="px-4 py-3 border-b border-glass-border">
+      <div className="px-4 py-3 border-b border-glass-border flex items-center justify-between">
         <span className="text-sm font-bold text-white tracking-wide">DevNotes</span>
+        <button
+          onClick={() => setShowLearnedRules(true)}
+          className="text-gray-500 hover:text-gray-300 transition-colors"
+          title="已学习的分类规则"
+        >
+          ⚙
+        </button>
       </div>
+
+      {showLearnedRules && (
+        <LearnedRulesPanel onClose={() => setShowLearnedRules(false)} />
+      )}
 
       <nav className="flex-1 overflow-y-auto py-2">
         {projects.map(project => (
