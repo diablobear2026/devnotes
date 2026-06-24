@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { open } from '@tauri-apps/plugin-dialog'
 import { useStore } from '../../store/useStore'
 
 export function Sidebar() {
@@ -6,6 +7,7 @@ export function Sidebar() {
   const activeProjectId = useStore(s => s.activeProjectId)
   const createProject = useStore(s => s.createProject)
   const deleteProject = useStore(s => s.deleteProject)
+  const setProjectLocalPath = useStore(s => s.setProjectLocalPath)
   const renameProject = useStore(s => s.renameProject)
   const setActiveProject = useStore(s => s.setActiveProject)
   const exportData = useStore(s => s.exportData)
@@ -33,6 +35,13 @@ export function Sidebar() {
       setNewName('')
     }
     setCreating(false)
+  }
+
+  async function pickDirectory(projectId: string) {
+    const selected = await open({ directory: true, multiple: false })
+    if (typeof selected === 'string') {
+      setProjectLocalPath(projectId, selected)
+    }
   }
 
   return (
@@ -73,6 +82,13 @@ export function Sidebar() {
                 {project.name}
               </span>
             )}
+            <button
+              onClick={e => { e.stopPropagation(); pickDirectory(project.id) }}
+              title={project.localPath ?? '绑定本地目录'}
+              className="opacity-0 group-hover:opacity-50 hover:!opacity-100 hover:text-gray-200 text-xs transition-opacity shrink-0 mr-1"
+            >
+              目录
+            </button>
             <button
               onClick={e => { e.stopPropagation(); deleteProject(project.id) }}
               className="opacity-0 group-hover:opacity-50 hover:!opacity-100 hover:text-red-400 text-xs transition-opacity shrink-0"
