@@ -65,4 +65,16 @@ describe('terminalSessions', () => {
     session.channel.onmessage?.('after-detach')
     expect(received).toEqual([])
   })
+
+  it('clears the wedged session on pty_spawn rejection so a retry can succeed', async () => {
+    ;(invoke as Mock).mockRejectedValueOnce(new Error('spawn failed'))
+    await expect(ensureSession('p6', '/tmp')).rejects.toThrow('spawn failed')
+    expect(hasSession('p6')).toBe(false)
+
+    ;(invoke as Mock).mockResolvedValueOnce('session-retry')
+    const session = await ensureSession('p6', '/tmp')
+    expect(session.sessionId).toBe('session-retry')
+    expect(hasSession('p6')).toBe(true)
+    expect(invoke).toHaveBeenCalledTimes(2)
+  })
 })

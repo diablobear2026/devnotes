@@ -32,9 +32,14 @@ export async function ensureSession(projectId: string, cwd: string): Promise<Ter
   }
 
   sessions.set(projectId, session)
-  const sessionId = await invoke<string>('pty_spawn', { cwd, onData: channel })
-  session.sessionId = sessionId
-  return session
+  try {
+    const sessionId = await invoke<string>('pty_spawn', { cwd, onData: channel })
+    session.sessionId = sessionId
+    return session
+  } catch (err) {
+    sessions.delete(projectId)
+    throw err
+  }
 }
 
 export function attach(projectId: string, listener: (chunk: string) => void): void {
