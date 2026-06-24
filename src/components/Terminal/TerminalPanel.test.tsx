@@ -33,6 +33,7 @@ vi.mock('../../lib/terminalSessions', () => ({
 
 import { ensureSession, killSession } from '../../lib/terminalSessions'
 import { TerminalPanel } from './TerminalPanel'
+import { useStore } from '../../store/useStore'
 
 class FakeResizeObserver {
   observe = vi.fn()
@@ -71,5 +72,22 @@ describe('TerminalPanel', () => {
 
     fireEvent.click(screen.getByText('关闭终端'))
     expect(killSession).toHaveBeenCalledWith('p1')
+  })
+
+  it('shows an error message when the session fails to start', async () => {
+    ;(ensureSession as Mock).mockRejectedValue(new Error('cwd 不存在'))
+    render(<TerminalPanel projectId="p1" localPath="/deleted/path" />)
+
+    expect(await screen.findByText(/终端启动失败/)).toBeInTheDocument()
+    expect(screen.getByText(/cwd 不存在/)).toBeInTheDocument()
+  })
+
+  it('returns to the notes view from the error state', async () => {
+    ;(ensureSession as Mock).mockRejectedValue(new Error('cwd 不存在'))
+    useStore.setState({ mainView: 'terminal' })
+    render(<TerminalPanel projectId="p1" localPath="/deleted/path" />)
+
+    fireEvent.click(await screen.findByText('返回笔记，重新绑定目录'))
+    expect(useStore.getState().mainView).toBe('notes')
   })
 })

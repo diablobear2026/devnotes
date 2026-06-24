@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { ensureSession, attach, detach, writeToSession, resizeSession, killSession } from '../../lib/terminalSessions'
+import { useStore } from '../../store/useStore'
 import '@xterm/xterm/css/xterm.css'
 
 interface Props {
@@ -61,6 +62,12 @@ export function TerminalPanel({ projectId, localPath }: Props) {
       <div className="flex-1 flex flex-col items-center justify-center gap-2 text-sm text-red-300 p-4 text-center">
         <span>终端启动失败：{error}</span>
         <span className="text-gray-500 text-xs">请检查项目绑定的目录是否仍然存在</span>
+        <button
+          onClick={() => useStore.getState().setMainView('notes')}
+          className="text-xs text-gray-400 hover:text-gray-200 underline mt-1"
+        >
+          返回笔记，重新绑定目录
+        </button>
       </div>
     )
   }
