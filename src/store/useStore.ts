@@ -9,9 +9,11 @@ interface Actions {
   deleteProject: (id: string) => void
   renameProject: (id: string, name: string) => void
   setActiveProject: (id: string) => void
+  setProjectLocalPath: (id: string, path: string) => void
 
   setActiveTab: (id: string) => void
   setCategoryFilter: (cat: NoteCategory | null) => void
+  setMainView: (view: 'notes' | 'terminal') => void
 
   addNote: (content: string, category?: NoteCategory) => void
   updateNote: (id: string, content: string, manualCategory?: NoteCategory) => void
@@ -26,6 +28,7 @@ interface Actions {
 // activeCategoryFilter 是纯内存状态，不持久化
 interface MemoryState {
   activeCategoryFilter: NoteCategory | null
+  mainView: 'notes' | 'terminal'
 }
 
 type Store = AppState & MemoryState & Actions
@@ -43,6 +46,7 @@ export const useStore = create<Store>((set, get) => {
   return {
     ...initial,
     activeCategoryFilter: null,
+    mainView: 'notes',
 
     createProject(name) {
       const project: Project = { id: uuid(), name, createdAt: Date.now() }
@@ -58,6 +62,10 @@ export const useStore = create<Store>((set, get) => {
 
     renameProject(id, name) {
       set(s => persist({ ...s, projects: s.projects.map(p => p.id === id ? { ...p, name } : p) }))
+    },
+
+    setProjectLocalPath(id, path) {
+      set(s => persist({ ...s, projects: s.projects.map(p => p.id === id ? { ...p, localPath: path } : p) }))
     },
 
     deleteProject(id) {
@@ -82,7 +90,7 @@ export const useStore = create<Store>((set, get) => {
     setActiveProject(id) {
       const s = get()
       const tab = s.tabs.find(t => t.projectId === id) ?? null
-      set(persist({ ...s, activeProjectId: id, activeTabId: tab?.id ?? null, activeCategoryFilter: null }))
+      set(persist({ ...s, activeProjectId: id, activeTabId: tab?.id ?? null, activeCategoryFilter: null, mainView: 'notes' }))
     },
 
     setActiveTab(id) {
@@ -91,6 +99,10 @@ export const useStore = create<Store>((set, get) => {
 
     setCategoryFilter(cat) {
       set(s => ({ ...s, activeCategoryFilter: cat }))
+    },
+
+    setMainView(view) {
+      set(s => ({ ...s, mainView: view }))
     },
 
     addNote(content, category) {

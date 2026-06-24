@@ -12,6 +12,7 @@ function resetStore() {
     searchQuery: '',
     learnedRules: {},
     activeCategoryFilter: null,
+    mainView: 'notes',
   })
 }
 
@@ -42,5 +43,44 @@ describe('learned rules', () => {
 
     useStore.getState().deleteLearnedRule('skills')
     expect(useStore.getState().learnedRules.skills).toBeUndefined()
+  })
+})
+
+describe('project local path', () => {
+  beforeEach(() => {
+    resetStore()
+  })
+
+  it('binds a local directory path to a project', () => {
+    useStore.getState().createProject('测试项目')
+    const project = useStore.getState().projects[0]
+    expect(project.localPath).toBeUndefined()
+
+    useStore.getState().setProjectLocalPath(project.id, '/Users/sam/code/demo')
+    expect(useStore.getState().projects[0].localPath).toBe('/Users/sam/code/demo')
+  })
+})
+
+describe('main view', () => {
+  beforeEach(() => {
+    resetStore()
+  })
+
+  it('defaults to notes view and can switch to terminal view', () => {
+    useStore.getState().createProject('测试项目')
+    expect(useStore.getState().mainView).toBe('notes')
+
+    useStore.getState().setMainView('terminal')
+    expect(useStore.getState().mainView).toBe('terminal')
+  })
+
+  it('resets to notes view when switching active project', () => {
+    useStore.getState().createProject('项目A')
+    const projectA = useStore.getState().projects[0]
+    useStore.getState().createProject('项目B')
+    useStore.getState().setMainView('terminal')
+
+    useStore.getState().setActiveProject(projectA.id)
+    expect(useStore.getState().mainView).toBe('notes')
   })
 })
