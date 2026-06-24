@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import type { AppState, Note, NoteCategory, Project, Tab } from '../types'
 import { load, save } from '../storage/storage'
 import { classify, extractSignal } from '../lib/classifier'
+import { killSession } from '../lib/terminalSessions'
 
 interface Actions {
   createProject: (name: string) => void
@@ -69,6 +70,7 @@ export const useStore = create<Store>((set, get) => {
     },
 
     deleteProject(id) {
+      killSession(id)
       const s = get()
       const remaining = s.projects.filter(p => p.id !== id)
       const nextProject = remaining[remaining.length - 1] ?? null

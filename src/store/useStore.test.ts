@@ -1,5 +1,16 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 import { useStore } from './useStore'
+
+vi.mock('@tauri-apps/api/core', () => {
+  class FakeChannel {
+    onmessage: ((data: string) => void) | null = null
+  }
+  return { invoke: vi.fn(), Channel: FakeChannel }
+})
+
+import { invoke } from '@tauri-apps/api/core'
+import { ensureSession, hasSession } from '../lib/terminalSessions'
 
 function resetStore() {
   localStorage.clear()
@@ -82,5 +93,25 @@ describe('main view', () => {
 
     useStore.getState().setActiveProject(projectA.id)
     expect(useStore.getState().mainView).toBe('notes')
+  })
+})
+
+describe('project deletion cleans up terminal sessions', () => {
+  beforeEach(() => {
+    resetStore()
+    ;(invoke as Mock).mockReset()
+    ;(invoke as Mock).mockResolvedValue('session-1')
+  })
+
+  it('kills the running terminal session when its project is deleted', async () => {
+    useStore.getState().createProject('测试项目')
+    const project = useStore.getState().projects[0]
+    await ensureSession(project.id, '/tmp')
+    expect(hasSession(project.id)).toBe(true)
+
+    useStore.getState().deleteProject(project.id)
+
+    expect(hasSession(project.id)).toBe(false)
+    expect(invoke).toHaveBeenCalledWith('pty_kill', { sessionId: 'session-1' })
   })
 })

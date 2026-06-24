@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
-import { invoke, Channel } from '@tauri-apps/api/core'
+import { ensureSession, attach, detach, writeToSession, resizeSession, killSession } from '../../lib/terminalSessions'
 import '@xterm/xterm/css/xterm.css'
 
 interface Props {
@@ -9,12 +9,13 @@ interface Props {
   localPath: string
 }
 
-export function TerminalPanel({ localPath }: Props) {
+export function TerminalPanel({ projectId, localPath }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const sessionIdRef = useRef<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!containerRef.current) return
+    setError(null)
 
     const term = new Terminal({ convertEol: true, fontSize: 13 })
     const fitAddon = new FitAddon()
@@ -22,26 +23,22 @@ export function TerminalPanel({ localPath }: Props) {
     term.open(containerRef.current)
     fitAddon.fit()
 
-    const channel = new Channel<string>()
-    channel.onmessage = chunk => term.write(chunk)
-
     let disposed = false
-    invoke<string>('pty_spawn', { cwd: localPath, onData: channel }).then(sessionId => {
-      if (disposed) return
-      sessionIdRef.current = sessionId
-    })
+    ensureSession(projectId, localPath)
+      .then(() => {
+        if (disposed) return
+        attach(projectId, chunk => term.write(chunk))
+      })
+      .catch((err: unknown) => {
+        if (disposed) return
+        setError(err instanceof Error ? err.message : String(err))
+      })
 
-    const dataListener = term.onData(data => {
-      if (sessionIdRef.current) {
-        invoke('pty_write', { sessionId: sessionIdRef.current, data })
-      }
-    })
+    const dataListener = term.onData(data => writeToSession(projectId, data))
 
     const resizeObserver = new ResizeObserver(() => {
       fitAddon.fit()
-      if (sessionIdRef.current) {
-        invoke('pty_resize', { sessionId: sessionIdRef.current, cols: term.cols, rows: term.rows })
-      }
+      resizeSession(projectId, term.cols, term.rows)
     })
     resizeObserver.observe(containerRef.current)
 
@@ -49,12 +46,36 @@ export function TerminalPanel({ localPath }: Props) {
       disposed = true
       resizeObserver.disconnect()
       dataListener.dispose()
+      detach(projectId)
       term.dispose()
-      if (sessionIdRef.current) {
-        invoke('pty_kill', { sessionId: sessionIdRef.current })
-      }
     }
-  }, [localPath])
+  }, [projectId, localPath])
 
-  return <div ref={containerRef} className="flex-1 min-h-0" />
+  function handleClose() {
+    killSession(projectId)
+    setError(null)
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 text-sm text-red-300 p-4 text-center">
+        <span>终端启动失败：{error}</span>
+        <span className="text-gray-500 text-xs">请检查项目绑定的目录是否仍然存在</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex justify-end px-3 py-1 border-b border-glass-border">
+        <button
+          onClick={handleClose}
+          className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+        >
+          关闭终端
+        </button>
+      </div>
+      <div ref={containerRef} className="flex-1 min-h-0" />
+    </div>
+  )
 }

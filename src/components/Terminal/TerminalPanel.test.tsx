@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react'
 
 vi.mock('@xterm/xterm', () => {
   class FakeTerminal {
@@ -22,14 +22,16 @@ vi.mock('@xterm/addon-fit', () => {
   return { FitAddon: FakeFitAddon }
 })
 
-vi.mock('@tauri-apps/api/core', () => {
-  class FakeChannel {
-    onmessage: ((data: string) => void) | null = null
-  }
-  return { invoke: vi.fn(), Channel: FakeChannel }
-})
+vi.mock('../../lib/terminalSessions', () => ({
+  ensureSession: vi.fn(),
+  attach: vi.fn(),
+  detach: vi.fn(),
+  writeToSession: vi.fn(),
+  resizeSession: vi.fn(),
+  killSession: vi.fn(),
+}))
 
-import { invoke } from '@tauri-apps/api/core'
+import { ensureSession, killSession } from '../../lib/terminalSessions'
 import { TerminalPanel } from './TerminalPanel'
 
 class FakeResizeObserver {
@@ -38,8 +40,9 @@ class FakeResizeObserver {
 }
 
 beforeEach(() => {
-  ;(invoke as Mock).mockReset()
-  ;(invoke as Mock).mockResolvedValue('session-1')
+  ;(ensureSession as Mock).mockReset()
+  ;(ensureSession as Mock).mockResolvedValue({ sessionId: 'session-1' })
+  ;(killSession as Mock).mockReset()
   ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = FakeResizeObserver
 })
 
@@ -48,17 +51,25 @@ afterEach(() => {
 })
 
 describe('TerminalPanel', () => {
-  it('spawns a pty session for the bound directory on mount', async () => {
+  it('requests a session for the project and bound directory on mount', async () => {
     render(<TerminalPanel projectId="p1" localPath="/Users/sam/code/demo" />)
     await waitFor(() => {
-      expect(invoke).toHaveBeenCalledWith('pty_spawn', expect.objectContaining({ cwd: '/Users/sam/code/demo' }))
+      expect(ensureSession).toHaveBeenCalledWith('p1', '/Users/sam/code/demo')
     })
   })
 
-  it('kills the session on unmount', async () => {
+  it('does not kill the session on unmount', async () => {
     const { unmount } = render(<TerminalPanel projectId="p1" localPath="/Users/sam/code/demo" />)
-    await waitFor(() => expect(invoke).toHaveBeenCalledWith('pty_spawn', expect.anything()))
+    await waitFor(() => expect(ensureSession).toHaveBeenCalled())
     unmount()
-    expect(invoke).toHaveBeenCalledWith('pty_kill', { sessionId: 'session-1' })
+    expect(killSession).not.toHaveBeenCalled()
+  })
+
+  it('kills the session when the close button is clicked', async () => {
+    render(<TerminalPanel projectId="p1" localPath="/Users/sam/code/demo" />)
+    await waitFor(() => expect(ensureSession).toHaveBeenCalled())
+
+    fireEvent.click(screen.getByText('关闭终端'))
+    expect(killSession).toHaveBeenCalledWith('p1')
   })
 })
