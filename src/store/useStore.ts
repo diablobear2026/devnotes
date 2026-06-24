@@ -86,6 +86,7 @@ export const useStore = create<Store>((set, get) => {
         activeProjectId: nextProject?.id ?? null,
         activeTabId: nextTab?.id ?? null,
         activeCategoryFilter: null,
+        mainView: 'notes',
       }))
     },
 

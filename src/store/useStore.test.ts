@@ -94,6 +94,23 @@ describe('main view', () => {
     useStore.getState().setActiveProject(projectA.id)
     expect(useStore.getState().mainView).toBe('notes')
   })
+
+  it('resets to notes view when deleting the active project in terminal view', () => {
+    useStore.getState().createProject('项目A')
+    const projectA = useStore.getState().projects[0]
+    useStore.getState().setProjectLocalPath(projectA.id, '/tmp/project-a')
+
+    useStore.getState().createProject('项目B')
+    const projectB = useStore.getState().projects[1]
+    useStore.getState().setProjectLocalPath(projectB.id, '/tmp/project-b')
+
+    useStore.getState().setActiveProject(projectA.id)
+    useStore.getState().setMainView('terminal')
+
+    useStore.getState().deleteProject(projectA.id)
+
+    expect(useStore.getState().mainView).toBe('notes')
+  })
 })
 
 describe('project deletion cleans up terminal sessions', () => {
